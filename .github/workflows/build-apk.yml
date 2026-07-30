@@ -34,9 +34,6 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
-      - name: Sync Capacitor Android
-        run: npx cap sync android
-
       - name: Make Gradle wrapper executable
         run: chmod +x android/gradlew
 
