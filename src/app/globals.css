@@ -1,0 +1,362 @@
+@import "tailwindcss";
+
+:root {
+  /* Dark modern minimal */
+  --background: #09090b;
+  --foreground: #fafafa;
+  --muted: #a1a1aa;
+  --muted-bg: #18181b;
+  --border: #27272a;
+  --border-strong: #3f3f46;
+  --surface: #111113;
+  --surface-2: #0c0c0e;
+
+  /* X-LINES green — accent only */
+  --accent: #22c55e;
+  --accent-hover: #16a34a;
+  --accent-soft: rgba(34, 197, 94, 0.12);
+  --accent-mid: #4ade80;
+  --accent-deep: #4ade80;
+  --accent-fg: #bbf7d0;
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.12);
+  --danger-fg: #fecaca;
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.12);
+  --warning-fg: #fde68a;
+
+  --float-shadow: rgba(0, 0, 0, 0.45);
+  --float-shadow-soft: rgba(0, 0, 0, 0.25);
+  --radius: 0.5rem;
+  --radius-sm: 0.375rem;
+  --radius-lg: 0.625rem;
+
+  /* Subtle ambient gradients */
+  --glow-green: rgba(34, 197, 94, 0.09);
+  --glow-cool: rgba(99, 102, 241, 0.06);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-bg: var(--muted-bg);
+  --color-border: var(--border);
+  --color-surface: var(--surface);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-deep: var(--accent-deep);
+  --color-accent-fg: var(--accent-fg);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --radius-gummy: var(--radius);
+  --radius-gummy-sm: var(--radius);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Hide number input spinners (Chrome/Safari/Edge + Firefox) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(900px 480px at 8% -12%, var(--glow-green), transparent 55%),
+    radial-gradient(700px 420px at 92% 0%, var(--glow-cool), transparent 50%),
+    radial-gradient(600px 360px at 50% 110%, rgba(34, 197, 94, 0.04), transparent 55%);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Surfaces / cards — max radius md + corner dots ─── */
+.surface,
+.surface-sm,
+.gummy,
+.clay,
+.clay-sm,
+.gummy-accent,
+.clay-accent,
+.gummy-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius); /* md max */
+  box-shadow: none;
+  color: var(--foreground);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 40%),
+    var(--surface);
+}
+
+.surface-sm {
+  background: var(--surface);
+}
+
+/* Hero — subtle green wash */
+.gummy-hero {
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(34, 197, 94, 0.1), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 45%),
+    var(--surface);
+}
+
+/* Content above decorative layers */
+.surface > *,
+.surface-sm > *,
+.gummy > *,
+.clay > *,
+.clay-sm > *,
+.gummy-accent > *,
+.clay-accent > *,
+.gummy-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Dot field — dense bottom-left corner, fades as triangle toward top-right */
+.surface::after,
+.surface-sm::after,
+.gummy::after,
+.clay::after,
+.clay-sm::after,
+.gummy-accent::after,
+.clay-accent::after,
+.gummy-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.2) 0.9px,
+    transparent 1.1px
+  );
+  background-size: 8px 8px;
+  background-position: left bottom;
+  -webkit-mask-image: linear-gradient(
+    to top right,
+    rgba(0, 0, 0, 0.75) 0%,
+    rgba(0, 0, 0, 0.4) 18%,
+    rgba(0, 0, 0, 0.15) 36%,
+    transparent 55%
+  );
+  mask-image: linear-gradient(
+    to top right,
+    rgba(0, 0, 0, 0.75) 0%,
+    rgba(0, 0, 0, 0.4) 18%,
+    rgba(0, 0, 0, 0.15) 36%,
+    transparent 55%
+  );
+}
+
+/* Accent metric — left bar above dots */
+.gummy-accent::before,
+.clay-accent::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  z-index: 2;
+  background: linear-gradient(180deg, var(--accent-mid), var(--accent));
+  pointer-events: none;
+}
+
+.gummy::before,
+.clay::before,
+.clay-sm::before,
+.gummy-hero::before {
+  display: none;
+}
+
+.row-soft {
+  background: var(--muted-bg);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+
+/* ─── Buttons — rubber gloss + thin border, no shadow ─── */
+.gummy-btn,
+.clay-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  user-select: none;
+  box-shadow: none !important;
+  transition:
+    filter 0.12s ease,
+    background 0.12s ease,
+    border-color 0.12s ease,
+    opacity 0.12s ease;
+}
+
+.gummy-btn::before,
+.clay-btn::before,
+.gummy-btn::after,
+.clay-btn::after {
+  display: none;
+}
+
+.gummy-btn > *,
+.clay-btn > * {
+  position: relative;
+  z-index: 1;
+}
+
+.gummy-btn:hover:not(:disabled),
+.clay-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.gummy-btn:active:not(:disabled),
+.clay-btn:active:not(:disabled) {
+  filter: brightness(0.95);
+  opacity: 0.92;
+}
+
+.gummy-btn:disabled,
+.clay-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gummy-btn-primary {
+  color: #052e16;
+  border-color: rgba(255, 255, 255, 0.16);
+  background: linear-gradient(165deg, #4ade80 0%, #22c55e 55%, #15803d 100%);
+}
+
+.gummy-btn-primary:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: linear-gradient(165deg, #5ee98d 0%, #22c55e 55%, #15803d 100%);
+}
+
+.gummy-btn-secondary {
+  color: var(--foreground);
+  border-color: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(165deg, #2a2a2e 0%, #1a1a1e 100%);
+}
+
+.gummy-btn-secondary:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: linear-gradient(165deg, #34343a 0%, #1f1f23 100%);
+}
+
+.gummy-btn-danger {
+  color: #450a0a;
+  border-color: rgba(255, 255, 255, 0.16);
+  background: linear-gradient(165deg, #f87171 0%, #ef4444 55%, #dc2626 100%);
+}
+
+.gummy-btn-danger:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: linear-gradient(165deg, #fb8a8a 0%, #ef4444 55%, #dc2626 100%);
+}
+
+.gummy-btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none !important;
+  color: var(--foreground);
+}
+
+.gummy-btn-ghost:hover:not(:disabled) {
+  background: var(--muted-bg);
+  border-color: var(--border);
+  filter: none;
+}
+
+.gummy-btn-ghost:active:not(:disabled) {
+  opacity: 0.92;
+}
+
+/* Floating */
+.float-shadow {
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 8px 24px var(--float-shadow);
+}
+
+.soft-blob {
+  display: none;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  color-scheme: dark;
+}
+
+::selection {
+  background: rgba(34, 197, 94, 0.35);
+  color: #fff;
+}
+
+.hairline {
+  border-color: var(--border);
+}
+
+/* Scrollbar — minimal modern */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--border-strong) 70%, transparent) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--border-strong) 55%, transparent);
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--muted) 50%, transparent);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}

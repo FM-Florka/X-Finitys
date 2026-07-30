@@ -1,0 +1,9 @@
+-- ⚠️ JANGAN jalankan file ini utuh di satu query.
+-- Postgres menolak pakai enum baru di transaksi yang sama (error 55P04).
+--
+-- Urutan yang benar (2 run terpisah di SQL Editor):
+--   1) 007_add_peringatan_enum.sql
+--   2) 007b_role_matrix_rls.sql
+--   (opsional) 008_piket_groups_rls_fix.sql — jika piket_groups masih RLS error
+--
+-- File ini dibiarkan sebagai penunjuk saja agar tidak double-apply.
