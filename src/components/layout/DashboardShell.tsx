@@ -2,24 +2,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { logoutAction } from "@/app/actions/auth";
 import { Button } from "@/components/ui/Button";
+import { DashboardNav } from "./DashboardNav";
 import {
   ROLE_LABEL,
   canAccessPengumuman,
   canView,
   type AppRole,
 } from "@/lib/roles";
-import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
 type NavItem = { href: string; label: string; show: boolean };
 
 export function DashboardShell({
   user,
-  active,
   children,
 }: {
   user: { name?: string | null; role: AppRole; email?: string | null };
-  active?: string;
   children: ReactNode;
 }) {
   const role = user.role;
@@ -100,28 +98,7 @@ export function DashboardShell({
             </form>
           </div>
         </div>
-        <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto border-t border-border px-4 sm:px-6">
-          {items.map((item) => {
-            const isActive =
-              active === item.href ||
-              (item.href !== "/dashboard" && active?.startsWith(item.href));
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={isActive ? "page" : undefined}
-                className={cn(
-                  "-mb-px whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium transition",
-                  isActive
-                    ? "border-accent text-foreground"
-                    : "border-transparent text-muted hover:border-border hover:text-foreground",
-                )}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+        <DashboardNav items={items.map(({ href, label }) => ({ href, label }))} />
       </header>
       <main className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6">
         {children}
