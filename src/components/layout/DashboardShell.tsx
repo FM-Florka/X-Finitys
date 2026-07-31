@@ -56,6 +56,16 @@ export function DashboardShell({
       show: canView(role, "galeri"),
     },
     {
+      href: "/dashboard/absensi",
+      label: "Absensi",
+      show: canView(role, "absensi"),
+    },
+    {
+      href: "/dashboard/materi",
+      label: "Materi",
+      show: canView(role, "materi"),
+    },
+    {
       href: "/jadwal",
       label: "Jadwal (preview)",
       // Role tanpa edit jadwal: akses preview publik dari nav

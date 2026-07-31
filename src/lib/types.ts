@@ -160,6 +160,50 @@ export type IncidentLog = {
   author?: Pick<Profile, "name"> | null;
 };
 
+/**
+ * Absensi harian — hanya ketidakhadiran yang dicatat.
+ * Tidak ada baris untuk suatu (user, tanggal) = siswa dianggap hadir.
+ */
+export type AttendanceStatus = "sakit" | "izin" | "alfa";
+
+export type AttendanceRecord = {
+  id: string;
+  user_id: string;
+  date: string;
+  status: AttendanceStatus;
+  note: string | null;
+  recorded_by: string | null;
+  created_at: string;
+  updated_at: string;
+  profile?: Pick<Profile, "name" | "nis"> | null;
+};
+
+/** Rekap absensi per siswa dalam satu rentang tanggal. */
+export type AttendanceSummary = {
+  user_id: string;
+  name: string;
+  sakit: number;
+  izin: number;
+  alfa: number;
+  /** Turunan: hari sekolah dalam rentang − total absen. */
+  hadir: number;
+};
+
+/** Materi & file pelajaran — bucket storage `materi` (private). */
+export type Material = {
+  id: string;
+  title: string;
+  description: string | null;
+  subject: string | null;
+  storage_path: string;
+  file_name: string;
+  file_size: number | null;
+  mime_type: string | null;
+  uploaded_by: string | null;
+  created_at: string;
+  uploader?: Pick<Profile, "name" | "role"> | null;
+};
+
 export type Album = {
   id: string;
   title: string;

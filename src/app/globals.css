@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
 :root {
+  /* Dark permanen — tidak ada light mode / toggle.
+     color-scheme bikin kontrol native (scrollbar, date & select picker,
+     autofill) ikut gelap, bukan cuma CSS var kita. */
+  color-scheme: dark;
+
   /* Dark modern minimal */
   --background: #09090b;
   --foreground: #fafafa;

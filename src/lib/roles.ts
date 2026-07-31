@@ -32,7 +32,9 @@ export type AppModule =
   | "keamanan"
   | "piket-kebersihan"
   | "jadwal"
-  | "galeri";
+  | "galeri"
+  | "absensi"
+  | "materi";
 
 /** @deprecated pakai AppModule */
 export type EditModule = AppModule;
@@ -45,7 +47,12 @@ const ALL_MODULES: AppModule[] = [
   "galeri",
   "keamanan",
   "piket-kebersihan",
+  "absensi",
+  "materi",
 ];
+
+/** Materi: semua role boleh buka dan upload. */
+const MATERI: AppModule[] = ["materi"];
 
 function normalizeRole(
   role: AppRole | string | undefined,
@@ -63,21 +70,24 @@ function normalizeRole(
  *
  * Matriks:
  * - Wali (guru), Ketua, Wakil → semua
- * - Bendahara → kas, pengumuman, galeri
- * - Sekretaris → pengumuman, galeri
- * - Keamanan → keamanan (log internal), pengumuman, galeri
- * - Kebersihan → piket-kebersihan, pengumuman, galeri
+ * - Bendahara → kas, pengumuman, galeri, materi
+ * - Sekretaris → pengumuman, galeri, absensi, materi
+ * - Keamanan → keamanan (log internal), pengumuman, galeri, materi
+ * - Kebersihan → piket-kebersihan, pengumuman, galeri, materi
+ * - Siswa → pengumuman, materi
+ * - Absensi edit: guru/ketua/wakil/sekretaris
+ * - Materi: semua role upload; hapus any → canDeleteAnyMateri
  */
 export const VIEW_ACCESS: Record<AppRole, AppModule[]> = {
-  /** Siswa: buka pengumuman untuk lihat tugas + centang kumpul. */
-  siswa: ["pengumuman"],
+  /** Siswa: pengumuman (tugas + centang kumpul) & materi. */
+  siswa: ["pengumuman", ...MATERI],
   ketua: [...ALL_MODULES],
   wakil: [...ALL_MODULES],
   guru: [...ALL_MODULES],
-  bendahara: ["kas", "pengumuman", "galeri"],
-  sekretaris: ["pengumuman", "galeri"],
-  keamanan: ["keamanan", "pengumuman", "galeri"],
-  kebersihan: ["piket-kebersihan", "pengumuman", "galeri"],
+  bendahara: ["kas", "pengumuman", "galeri", ...MATERI],
+  sekretaris: ["pengumuman", "galeri", "absensi", ...MATERI],
+  keamanan: ["keamanan", "pengumuman", "galeri", ...MATERI],
+  kebersihan: ["piket-kebersihan", "pengumuman", "galeri", ...MATERI],
 };
 
 /**
@@ -86,14 +96,15 @@ export const VIEW_ACCESS: Record<AppRole, AppModule[]> = {
  * Peringatan piket: keamanan/kebersihan lewat canCreatePeringatan (bukan full pengumuman).
  */
 export const EDIT_ACCESS: Record<AppRole, AppModule[]> = {
-  siswa: [],
+  /** Materi: semua role boleh upload (hapus dibatasi ke file sendiri). */
+  siswa: [...MATERI],
   ketua: [...ALL_MODULES],
   wakil: [...ALL_MODULES],
   guru: [...ALL_MODULES],
-  bendahara: ["kas"],
-  keamanan: ["keamanan"],
-  kebersihan: ["piket-kebersihan"],
-  sekretaris: ["pengumuman", "galeri"],
+  bendahara: ["kas", ...MATERI],
+  keamanan: ["keamanan", ...MATERI],
+  kebersihan: ["piket-kebersihan", ...MATERI],
+  sekretaris: ["pengumuman", "galeri", "absensi", ...MATERI],
 };
 
 /** Prefix path dashboard → modul (urutan: spesifik dulu). */
@@ -110,7 +121,28 @@ export const DASHBOARD_ROUTE_MODULES: {
   { prefix: "/dashboard/jadwal", module: "jadwal" },
   { prefix: "/dashboard/galeri", module: "galeri" },
   { prefix: "/dashboard/kas", module: "kas" },
+  { prefix: "/dashboard/absensi", module: "absensi" },
+  { prefix: "/dashboard/materi", module: "materi" },
 ];
+
+/** Role yang boleh isi/ubah absensi — mirror RLS di migration 014. */
+export const ABSENSI_EDITOR_ROLES: AppRole[] = [
+  "guru",
+  "ketua",
+  "wakil",
+  "sekretaris",
+];
+
+/**
+ * Boleh hapus materi milik orang lain.
+ * Upload & hapus milik sendiri: semua role (lihat EDIT_ACCESS).
+ */
+export function canDeleteAnyMateri(
+  role: AppRole | string | undefined,
+): boolean {
+  const key = normalizeRole(role);
+  return key === "guru" || key === "ketua" || key === "wakil";
+}
 
 export function moduleForDashboardPath(path: string): AppModule | null {
   const clean = path.split("?")[0]?.replace(/\/$/, "") || path;

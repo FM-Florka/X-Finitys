@@ -57,13 +57,17 @@ Path di bawah = **route app** (prefix `/dashboard/...`). `/jadwal`, `/informasi`
 
 | Role | View modul | Edit / tulis |
 |------|------------|--------------|
-| **Wali (`guru`), Ketua, Wakil** | **Semua** (kas, pengumuman, pengurus, jadwal, galeri, piket kebersihan, **keamanan**/log) | **Semua** |
-| **Bendahara** | kas, pengumuman, galeri | **kas** saja |
-| **Sekretaris** | pengumuman, galeri | pengumuman, galeri |
-| **Keamanan** | **keamanan** (log internal), pengumuman, galeri | **keamanan**; **pengumuman hanya kategori `peringatan`** |
-| **Kebersihan** | piket-kebersihan, pengumuman, galeri | piket-kebersihan; **pengumuman hanya `peringatan`** |
-| **Siswa** | Hanya ringkasan `/dashboard` + `/dashboard/saya` | — |
+| **Wali (`guru`), Ketua, Wakil** | **Semua** (kas, pengumuman, pengurus, jadwal, galeri, piket kebersihan, **keamanan**/log, **absensi**, **materi**) | **Semua** (materi: hapus file siapa saja) |
+| **Bendahara** | kas, pengumuman, galeri, **materi** | **kas** + **materi** (upload / hapus milik sendiri) |
+| **Sekretaris** | pengumuman, galeri, **absensi**, **materi** | pengumuman, galeri, **absensi**, **materi** |
+| **Keamanan** | **keamanan** (log internal), pengumuman, galeri, **materi** | **keamanan** + **materi**; **pengumuman hanya kategori `peringatan`** |
+| **Kebersihan** | piket-kebersihan, pengumuman, galeri, **materi** | piket-kebersihan + **materi**; **pengumuman hanya `peringatan`** |
+| **Siswa** | ringkasan `/dashboard` + `/dashboard/saya` + pengumuman (tugas) + **materi** | **materi** (upload / hapus milik sendiri) |
 | **Publik / guest** | **Tidak ada** — hanya `/login` | — |
+
+**Absensi:** view+edit hanya Wali / Ketua / Wakil / Sekretaris (`ABSENSI_EDITOR_ROLES`). Model *absence-only*: baris = tidak hadir (sakit/izin/alfa); tanpa baris = hadir.
+
+**Materi:** semua role login boleh buka + upload; hapus file orang lain hanya Wali / Ketua / Wakil (`canDeleteAnyMateri`). Bucket storage `materi` **private** (signed URL).
 
 **Jadwal:**
 
@@ -119,6 +123,7 @@ Apply lewat **Supabase SQL Editor** (urutan di bawah). Tidak ada CLI migrate oto
 | `011_piket_fixed_days.sql` | Piket fixed Senin–Jumat (`day_of_week`), bukan rotasi; `piket_task_defs` + RLS |
 | `012_incident_log_fields.sql` | Log keamanan: `student_name`, `occurred_at` + RLS internal (bukan publik) |
 | `013_require_login_revoke_anon.sql` | **Semua wajib login**: policy read `anon` → `authenticated`, revoke grant anon (bucket `gallery` tetap public read) |
+| `014_attendance_materials.sql` | Tabel `attendance_records` + `materials` + RLS; bucket storage **`materi`** (private) |
 
 **Penting Postgres:** nilai enum baru **tidak boleh** dipakai di policy dalam transaksi yang sama → selalu **007 enum dulu**, commit, baru **007b**; sama untuk **009 → 009b**.
 
@@ -144,9 +149,11 @@ Apply lewat **Supabase SQL Editor** (urutan di bawah). Tidak ada CLI migrate oto
 | **piket_task_defs** | `group_id`, `task_label`, `sort_order` · unique (group, label) | Template tugas permanen per hari |
 | **piket_checks** | `group_id`, `date`, `task_label`, `done`, `checked_by` | Status selesai **per tanggal** (template di defs) |
 | **incident_logs** | `title`, `description`, `student_name?`, `occurred_at`, `date`, `author_id` | Log **Keamanan** internal (RLS; bukan feed publik) |
-| **albums** / **photos** | album meta + `storage_path` di bucket **`gallery`** | Galeri publik |
+| **albums** / **photos** | album meta + `storage_path` di bucket **`gallery`** | Galeri (login) |
+| **attendance_records** | `user_id`, `date`, `status` (sakit/izin/alfa), `note`, `recorded_by` · unique (user, date) | Absensi *absence-only* |
+| **materials** | `title`, `description`, `subject`, `storage_path`, `file_name`, `file_size`, `mime_type`, `uploaded_by` | Materi & file pelajaran |
 
-Storage bucket: **`gallery`** (public read; upload editor).
+Storage bucket: **`gallery`** (public read; upload editor), **`materi`** (private; signed URL).
 
 Seed SQL opsional: `supabase/seed.sql`. User Auth: script Node di `scripts/`.
 
@@ -154,7 +161,7 @@ Seed SQL opsional: `supabase/seed.sql`. User Auth: script Node di `scripts/`.
 
 ## 4. Konsep desain
 
-- **Tema:** Vercel-like **light** — monokrom putih / abu / hitam; **hijau = satu-satunya aksen** (CSS vars: `--accent`, dll.).
+- **Tema:** **dark permanen** — monokrom hitam / zinc (`--background: #09090b`, `--surface: #111113`); **hijau = satu-satunya aksen** (CSS vars: `--accent`, dll.). Tidak ada light mode, toggle, atau `prefers-color-scheme`: `:root` set `color-scheme: dark` dan `<html>` selalu `class="dark"`.
 - **Border** tipis ~1px; **radius** kecil–menengah; **hindari** gradient kencang, gloss, shadow tebal.
 - **Dashboard layout:** bento **asimetris** — 1 elemen hero + side metrics, bukan grid seragam.
 - Komponen UI: `src/components/ui/*` (Button, Card, Badge, Modal, Input, Select, …).
@@ -241,18 +248,21 @@ Script lain di `scripts/`: `cleanup-xf-local.mjs`, `verify-*.mjs`, `apply-006-wa
 - [x] Kategori pengumuman **tugas** (deadline, mapel, status kumpul per siswa, final)
 - [x] Seed siswa format email `@xfinitys.my.id`
 - [x] Script cleanup akun demo `@xf.local`
+- [x] **Dark permanen** (`color-scheme: dark`, `<html class="dark">`, monokrom + aksen hijau)
+- [x] **Absensi harian** (`/dashboard/absensi`) — absence-only, rekap bulanan; editor: wali/ketua/wakil/sekretaris
+- [x] **Materi & file pelajaran** (`/dashboard/materi`) — upload semua role, bucket private + signed URL
 
 ### Perhatian / follow-up ops
 
-- [ ] Pastikan migration `007`→`011` + **`012_incident_log_fields`** + **`013_require_login_revoke_anon`** sudah di-run di Supabase
-- [ ] Verifikasi end-to-end per role (kas, piket kebersihan, log keamanan, peringatan, jadwal) di environment live
+- [ ] Pastikan migration `007`→`011` + **`012`** + **`013`** + **`014_attendance_materials`** sudah di-run di Supabase (buat bucket `materi`)
+- [ ] Verifikasi end-to-end per role (kas, piket kebersihan, log keamanan, peringatan, jadwal, **absensi**, **materi**) di environment live
 - [ ] Deploy Vercel + env production terset lengkap
 - [ ] Typecheck: ada error pre-existing di `src/app/actions/pengurus.ts` (Promise builder Supabase) — perbaiki jika menyentuh file itu
 - [ ] README default create-next-app masih generik — opsional diganti
 
 ### Belum / di luar scope saat ini
 
-- [ ] Dark mode
+- [ ] Light mode / theme toggle (sengaja tidak ada — dark permanen)
 - [ ] Notifikasi push / email
 - [ ] Mobile app native
 - [ ] Multi-kelas / multi-tenant
@@ -279,16 +289,16 @@ Script lain di `scripts/`: `cleanup-xf-local.mjs`, `verify-*.mjs`, `apply-006-wa
 src/
   app/
     page.tsx, jadwal/, informasi/, galeri/, login/
-    dashboard/          # kas, pengumuman, pengurus, jadwal, galeri, piket/kebersihan, keamanan, saya
-    actions/            # server mutations (piket.ts, keamanan.ts, …)
+    dashboard/          # kas, pengumuman, pengurus, jadwal, galeri, piket/kebersihan, keamanan, absensi, materi, saya
+    actions/            # server mutations (piket.ts, keamanan.ts, absensi.ts, materi.ts, …)
   components/layout/    # DashboardShell, PublicShell, PublicNav
   components/piket/     # PiketBoard (kebersihan)
   components/ui/
   lib/
-    roles.ts, auth-helpers.ts, types.ts, announcements.ts, kas.ts, piket.ts, utils.ts
+    roles.ts, auth-helpers.ts, types.ts, announcements.ts, kas.ts, piket.ts, absensi.ts, utils.ts
     supabase/           # client, server, middleware, admin
   middleware.ts
-supabase/migrations/    # 001 … 012
+supabase/migrations/    # 001 … 014
 scripts/                # seed & cleanup
 ```
 
