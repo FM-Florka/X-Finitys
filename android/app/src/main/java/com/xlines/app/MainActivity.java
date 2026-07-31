@@ -20,13 +20,16 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
 
         // Ensure cookies are accepted and persisted across app sessions
+        // (keeps Supabase Auth session cookies alive between launches)
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
-        cookieManager.setAcceptThirdPartyCookies(this.getWebView(), true);
 
-        // For Android 5.0+ (Lollipop+), enable third-party cookie persistence
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            cookieManager.setAcceptThirdPartyCookies(this.getWebView(), true);
+        // BridgeActivity has no getWebView() — access via Bridge
+        // setAcceptThirdPartyCookies requires API 21+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP
+                && getBridge() != null
+                && getBridge().getWebView() != null) {
+            cookieManager.setAcceptThirdPartyCookies(getBridge().getWebView(), true);
         }
     }
 
