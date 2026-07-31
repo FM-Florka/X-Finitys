@@ -76,7 +76,7 @@ export function DashboardShell({
                 alt="X-Finitys"
                 width={32}
                 height={32}
-                className="size-8 rounded-md border border-border object-cover"
+                className="size-8 rounded-md object-cover"
               />
             </Link>
             <div>
@@ -100,7 +100,7 @@ export function DashboardShell({
             </form>
           </div>
         </div>
-        <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto border-t border-border px-4 py-2 sm:px-6">
+        <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto border-t border-border px-4 sm:px-6">
           {items.map((item) => {
             const isActive =
               active === item.href ||
@@ -109,11 +109,12 @@ export function DashboardShell({
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition",
+                  "-mb-px whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium transition",
                   isActive
-                    ? "bg-accent-soft text-accent-fg"
-                    : "text-muted hover:bg-muted-bg hover:text-foreground",
+                    ? "border-accent text-foreground"
+                    : "border-transparent text-muted hover:border-border hover:text-foreground",
                 )}
               >
                 {item.label}

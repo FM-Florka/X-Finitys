@@ -42,7 +42,7 @@ export async function PublicNav({
             alt="X-Finitys"
             width={28}
             height={28}
-            className="size-7 rounded-md border border-border object-cover"
+            className="size-7 rounded-md object-cover"
           />
           <span className="hidden sm:inline">X-Finitys</span>
         </Link>

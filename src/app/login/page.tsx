@@ -28,7 +28,7 @@ export default async function LoginPage({
             alt="X-Finitys"
             width={72}
             height={72}
-            className="size-[72px] rounded-xl border border-border object-cover"
+            className="size-[72px] rounded-xl object-cover"
             priority
           />
           <h1 className="mt-4 text-2xl font-semibold tracking-tight">
