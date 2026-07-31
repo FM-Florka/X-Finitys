@@ -1,4 +1,4 @@
-# X-LINES Android App Setup
+# X-Finitys Android App Setup
 
 ## Debug APK vs Release APK (untuk developer)
 

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">X-LINES</string>
-    <string name="title_activity_main">X-LINES</string>
+    <string name="app_name">X-Finitys</string>
+    <string name="title_activity_main">X-Finitys</string>
     <string name="package_name">com.xlines.app</string>
     <string name="custom_url_scheme">com.xlines.app</string>
 </resources>

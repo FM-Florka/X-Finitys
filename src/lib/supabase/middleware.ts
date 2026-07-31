@@ -43,6 +43,15 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname
 
+  // Tidak ada landing publik: root selalu ke login (atau dashboard kalau sudah login).
+  // Berlaku sama untuk browser web maupun WebView app Android.
+  if (path === '/') {
+    const url = request.nextUrl.clone()
+    url.pathname = user ? '/dashboard' : '/login'
+    url.search = ''
+    return NextResponse.redirect(url)
+  }
+
   // Proteksi dashboard — guest diarahkan ke login
   if (!user && path.startsWith('/dashboard')) {
     const url = request.nextUrl.clone()

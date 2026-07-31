@@ -14,11 +14,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "XF Hub — Website Kelas",
-    template: "%s · XF Hub",
+    default: "X-Finitys — Website Kelas",
+    template: "%s · X-Finitys",
   },
   description:
     "Pusat informasi & administrasi kelas: jadwal, piket, kas, galeri, dan pengumuman.",
+  icons: { icon: "/icon.png", apple: "/icon.png" },
 };
 
 export default function RootLayout({

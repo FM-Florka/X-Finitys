@@ -12,12 +12,16 @@ function friendlyAuthError(message: string): string {
     m.includes("invalid login credentials") ||
     m.includes("invalid_credentials")
   ) {
-    return "Email atau password salah. Pastikan user sudah dibuat di Supabase Auth (npm run db:seed-users).";
+    return "Email atau password salah. Coba periksa lagi.";
   }
   if (m.includes("email not confirmed")) {
-    return "Email belum dikonfirmasi. Matikan Confirm email di Auth settings, atau konfirmasi dulu.";
+    return "Akun belum aktif. Hubungi pengurus kelas untuk mengaktifkan.";
   }
-  return message;
+  if (m.includes("rate limit") || m.includes("too many")) {
+    return "Terlalu banyak percobaan. Tunggu sebentar, lalu coba lagi.";
+  }
+  // Jangan bocorkan pesan teknis mentah ke end user
+  return "Tidak bisa masuk sekarang. Coba beberapa saat lagi.";
 }
 
 export async function loginAction(formData: FormData) {
@@ -49,7 +53,7 @@ export async function loginAction(formData: FormData) {
     await supabase.auth.signOut();
     redirect(
       `/login?error=${encodeURIComponent(
-        "Login OK, tapi baris profiles gagal dibuat. Jalankan supabase/migrations/002_profiles_bootstrap.sql di SQL Editor, lalu coba lagi.",
+        "Akun Anda belum terdaftar di kelas ini. Hubungi pengurus kelas.",
       )}`,
     );
   }
@@ -60,5 +64,5 @@ export async function loginAction(formData: FormData) {
 export async function logoutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect("/");
+  redirect("/login");
 }

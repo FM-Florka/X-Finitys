@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { logoutAction } from "@/app/actions/auth";
 import { Button } from "@/components/ui/Button";
 import {
@@ -69,12 +70,14 @@ export function DashboardShell({
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="inline-flex items-baseline font-bold leading-none tracking-tight"
-            >
-              <span className="text-xl">X</span>
-              <span className="text-sm text-accent">F</span>
+            <Link href="/dashboard" className="inline-flex items-center">
+              <Image
+                src="/icon.png"
+                alt="X-Finitys"
+                width={32}
+                height={32}
+                className="size-8 rounded-md border border-border object-cover"
+              />
             </Link>
             <div>
               <p className="text-sm font-semibold leading-tight">Dashboard</p>
@@ -85,7 +88,7 @@ export function DashboardShell({
           </div>
           <div className="flex items-center gap-2">
             <Link
-              href="/"
+              href="/jadwal"
               className="gummy-btn gummy-btn-secondary h-8 rounded-md px-3 text-xs sm:text-sm"
             >
               <span>Situs publik</span>

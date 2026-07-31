@@ -1,10 +1,10 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getProfile } from "@/lib/auth-helpers";
 import { dashboardHome } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "/", label: "Beranda" },
   { href: "/jadwal", label: "Jadwal" },
   { href: "/galeri", label: "Galeri" },
   { href: "/informasi", label: "Informasi" },
@@ -31,17 +31,20 @@ export async function PublicNav({
     >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
         <Link
-          href="/"
+          href="/jadwal"
           className={cn(
             "flex items-center gap-2 font-semibold tracking-tight",
             overlay && "text-white",
           )}
         >
-          <span className="inline-flex items-baseline font-bold leading-none tracking-tight">
-            <span className="text-xl">X</span>
-            <span className="text-sm text-accent">F</span>
-          </span>
-          <span className="hidden sm:inline">XF Hub</span>
+          <Image
+            src="/icon.png"
+            alt="X-Finitys"
+            width={28}
+            height={28}
+            className="size-7 rounded-md border border-border object-cover"
+          />
+          <span className="hidden sm:inline">X-Finitys</span>
         </Link>
 
         <nav className="flex flex-1 items-center justify-center gap-1 overflow-x-auto sm:gap-1.5">

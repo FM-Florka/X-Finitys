@@ -1,4 +1,4 @@
-# X-LINES Hub — project context for agents
+# X-Finitys — project context for agents
 
 **Baca file ini dulu** sebelum eksplorasi codebase atau ubah fitur.  
 Jangan re-discover dari nol apa yang sudah terdokumentasi di sini.
@@ -11,7 +11,7 @@ Jangan re-discover dari nol apa yang sudah terdokumentasi di sini.
 
 | | |
 |---|---|
-| **Nama** | **X-LINES Hub** (brand UI: XF / X-LINES) |
+| **Nama** | **X-Finitys** (brand UI: X-Finitys; logo `public/icon.png`) |
 | **Konteks** | Website kelas **10 F / X F**, **SMAN 11 Pontianak** — pusat info + administrasi kelas |
 | **Stack** | **Next.js 16** (App Router, React 19) + **Supabase** (Postgres, Auth, Storage, **RLS**) + Tailwind 4 |
 | **Package** | `xf-hub` (`package.json`) |
