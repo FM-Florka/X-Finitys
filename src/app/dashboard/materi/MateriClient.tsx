@@ -211,11 +211,11 @@ export function MateriClient({
                     variant="secondary"
                     size="sm"
                     onClick={() => download(m)}
-                    disabled={downloading === m.id}
+                    loading={downloading === m.id}
                     aria-label={`Unduh ${m.title}`}
                   >
                     <Download className="size-4" aria-hidden />
-                    {downloading === m.id ? "…" : "Unduh"}
+                    Unduh
                   </Button>
                   {canDelete(m) ? (
                     <Button
@@ -288,7 +288,7 @@ export function MateriClient({
             >
               Batal
             </Button>
-            <Button type="submit" disabled={pending}>
+            <Button type="submit" loading={pending}>
               {pending ? "Mengunggah…" : "Unggah"}
             </Button>
           </div>

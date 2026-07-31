@@ -423,7 +423,7 @@ export function PiketBoard({
               <Button
                 type="button"
                 size="sm"
-                disabled={pending}
+                loading={pending}
                 onClick={saveMembers}
               >
                 {pending ? "Menyimpan…" : "Simpan"}
@@ -489,7 +489,7 @@ export function PiketBoard({
               <Button
                 type="button"
                 size="sm"
-                disabled={pending}
+                loading={pending}
                 onClick={saveTask}
               >
                 {pending ? "Menyimpan…" : "Tambah"}

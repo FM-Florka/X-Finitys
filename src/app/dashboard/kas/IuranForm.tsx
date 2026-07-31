@@ -73,7 +73,7 @@ export function IuranForm({ onClose }: { onClose?: () => void }) {
         <Button
           type="submit"
           size="sm"
-          disabled={pending}
+          loading={pending}
           className="flex-1 sm:h-9 sm:flex-none sm:px-3.5 sm:text-sm"
         >
           {pending ? "Menyimpan…" : "Buat iuran"}

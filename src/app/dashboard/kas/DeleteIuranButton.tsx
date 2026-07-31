@@ -47,7 +47,7 @@ export function DeleteIuranButton({
             type="button"
             variant="danger"
             size="sm"
-            disabled={pending}
+            loading={pending}
             onClick={() => {
               start(async () => {
                 const fd = new FormData();

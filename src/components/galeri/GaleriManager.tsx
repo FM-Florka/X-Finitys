@@ -403,7 +403,7 @@ export function GaleriManager({
               type="button"
               variant="danger"
               size="sm"
-              disabled={pending}
+              loading={pending}
               onClick={handleDeleteAlbum}
             >
               {pending ? "Menghapus…" : "Ya, hapus album"}
@@ -431,7 +431,7 @@ export function GaleriManager({
               type="button"
               variant="danger"
               size="sm"
-              disabled={pending}
+              loading={pending}
               onClick={handleDeletePhoto}
             >
               {pending ? "Menghapus…" : "Ya, hapus"}
@@ -479,7 +479,7 @@ export function GaleriManager({
               <Button
                 type="button"
                 size="sm"
-                disabled={pending}
+                loading={pending}
                 onClick={handleSaveCaption}
               >
                 {pending ? "Menyimpan…" : "Simpan"}
@@ -599,7 +599,7 @@ export function GaleriManager({
                   <DatePicker id="eventDate" name="eventDate" placeholder="Pilih tanggal acara" />
                 </Field>
                 <div className="flex flex-wrap gap-2 pt-1">
-                  <Button type="submit" disabled={pending}>
+                  <Button type="submit" loading={pending}>
                     {pending ? "Menyimpan…" : "Buat album"}
                   </Button>
                   <Button
@@ -819,7 +819,7 @@ function PhotoFormCard({
         ) : null}
 
         <div className="flex flex-wrap gap-2 pt-1">
-          <Button type="submit" disabled={pending || !albumId}>
+          <Button type="submit" loading={pending} disabled={!albumId}>
             {pending ? "Mengunggah…" : "Tambah foto"}
           </Button>
           <Button

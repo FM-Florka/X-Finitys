@@ -287,7 +287,7 @@ export function KeamananClient({
             <Button
               type="button"
               size="sm"
-              disabled={pending}
+              loading={pending}
               onClick={save}
             >
               {pending ? "Menyimpan…" : "Simpan log"}

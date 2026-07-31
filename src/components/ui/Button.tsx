@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
@@ -17,15 +18,25 @@ const sizes: Record<Size, string> = {
   lg: "h-10 px-4 text-sm rounded-md",
 };
 
+const spinnerSize: Record<Size, string> = {
+  sm: "size-3",
+  md: "size-3.5",
+  lg: "size-4",
+};
+
 export function Button({
   className,
   variant = "primary",
   size = "md",
+  loading = false,
+  disabled,
   children,
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: Variant;
   size?: Size;
+  /** Spinner di belakang teks + auto-disable. */
+  loading?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -36,9 +47,17 @@ export function Button({
         sizes[size],
         className,
       )}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
       {...props}
     >
       {children}
+      {loading ? (
+        <Loader2
+          className={cn(spinnerSize[size], "shrink-0 animate-spin")}
+          aria-hidden
+        />
+      ) : null}
     </button>
   );
 }
