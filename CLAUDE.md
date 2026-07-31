@@ -22,9 +22,15 @@ Jangan re-discover dari nol apa yang sudah terdokumentasi di sini.
 
 | Area | Path | Auth |
 |------|------|------|
-| Publik | `/`, `/jadwal`, `/informasi`, `/galeri`, `/galeri/[id]` | Tanpa login (read) |
-| Auth | `/login` | Guest |
-| Dashboard | `/dashboard/*` | Login wajib |
+| Auth | `/login` | Guest (satu-satunya route terbuka) |
+| Root | `/` | Redirect → `/login` (guest) / `/dashboard` (login) |
+| Internal | `/jadwal`, `/informasi`, `/galeri`, `/galeri/[id]` | **Login wajib** |
+| Dashboard | `/dashboard/*` | Login wajib + guard role |
+
+**Tidak ada landing page publik.** Sejak `013_require_login_revoke_anon.sql`,
+role `anon` tidak punya SELECT di schema `public` — semua data kelas
+authenticated-only. Storage bucket `gallery` tetap public read (dibutuhkan
+`<img src>`; daftar album/foto sendiri sudah di balik login).
 
 Spesifikasi produk awal: `WEBSITE.md` (boleh partial outdated vs kode).
 
@@ -47,7 +53,7 @@ Spesifikasi produk awal: `WEBSITE.md` (boleh partial outdated vs kode).
 
 ### Matriks akses (dashboard modul)
 
-Path di bawah = **route app** (prefix `/dashboard/...`). Publik `/jadwal`, `/informasi`, `/galeri` tetap bisa dibuka semua (read-only).
+Path di bawah = **route app** (prefix `/dashboard/...`). `/jadwal`, `/informasi`, `/galeri` bisa dibuka **semua role yang sudah login** (read-only), bukan guest.
 
 | Role | View modul | Edit / tulis |
 |------|------------|--------------|
@@ -57,13 +63,12 @@ Path di bawah = **route app** (prefix `/dashboard/...`). Publik `/jadwal`, `/inf
 | **Keamanan** | **keamanan** (log internal), pengumuman, galeri | **keamanan**; **pengumuman hanya kategori `peringatan`** |
 | **Kebersihan** | piket-kebersihan, pengumuman, galeri | piket-kebersihan; **pengumuman hanya `peringatan`** |
 | **Siswa** | Hanya ringkasan `/dashboard` + `/dashboard/saya` | — |
-| **Publik / guest** | Landing, jadwal preview, informasi, galeri | — |
+| **Publik / guest** | **Tidak ada** — hanya `/login` | — |
 
 **Jadwal:**
 
 - **Edit:** `/dashboard/jadwal` — hanya Wali / Ketua / Wakil (`canEdit(..., "jadwal")`).
-- **Preview:** `/jadwal` — semua role + publik, **tanpa** tombol ubah/tambah (kecuali link “Mode edit” jika user editor).
-- Landing menampilkan **preview jadwal hari ini** + link “Lihat jadwal lengkap”.
+- **Preview:** `/jadwal` — semua role yang login, **tanpa** tombol ubah/tambah (kecuali link “Mode edit” jika user editor).
 
 **Pengumuman kategori `peringatan`:**
 
@@ -113,6 +118,7 @@ Apply lewat **Supabase SQL Editor** (urutan di bawah). Tidak ada CLI migrate oto
 | `010_schedule_unique_day_period.sql` | Unique `(day_of_week, period)` + dedup slot bentrok |
 | `011_piket_fixed_days.sql` | Piket fixed Senin–Jumat (`day_of_week`), bukan rotasi; `piket_task_defs` + RLS |
 | `012_incident_log_fields.sql` | Log keamanan: `student_name`, `occurred_at` + RLS internal (bukan publik) |
+| `013_require_login_revoke_anon.sql` | **Semua wajib login**: policy read `anon` → `authenticated`, revoke grant anon (bucket `gallery` tetap public read) |
 
 **Penting Postgres:** nilai enum baru **tidak boleh** dipakai di policy dalam transaksi yang sama → selalu **007 enum dulu**, commit, baru **007b**; sama untuk **009 → 009b**.
 
@@ -184,7 +190,7 @@ Contoh: `.env.example`.
 
 - **Server Actions** di `src/app/actions/` (`"use server"`).
 - Dashboard pages: `src/app/dashboard/<modul>/`.
-- Publik: `src/app/page.tsx`, `jadwal`, `informasi`, `galeri`.
+- Root: `src/app/page.tsx` (redirect → `/login`). Read-only internal: `jadwal`, `informasi`, `galeri`.
 - Types: `src/lib/types.ts`. Utils: `src/lib/utils.ts`. Kas helpers: `src/lib/kas.ts`.
 - Next 16: baca `node_modules/next/dist/docs/` jika API tidak familiar (`AGENTS.md`).
 
@@ -219,7 +225,7 @@ Script lain di `scripts/`: `cleanup-xf-local.mjs`, `verify-*.mjs`, `apply-006-wa
 
 ### Selesai (implementasi kode)
 
-- [x] Landing publik (hero, pengumuman, piket, event, preview jadwal hari ini)
+- [x] Root `/` redirect → `/login` (landing publik dihapus; semua wajib login)
 - [x] Auth login Supabase + bootstrap profile
 - [x] Dashboard ringkasan + Data saya (status bayar)
 - [x] Modul **Kas** (iuran, transaksi, payment status, role editor)
@@ -228,8 +234,8 @@ Script lain di `scripts/`: `cleanup-xf-local.mjs`, `verify-*.mjs`, `apply-006-wa
 - [x] **Piket kebersihan** (5 hari tetap, template tugas, checklist harian, shortcut peringatan)
 - [x] **Keamanan** (`/dashboard/keamanan`) — log kejadian internal + shortcut peringatan (bukan grid 5 hari)
 - [x] **Jadwal** grid mingguan (preview `/jadwal` + edit `/dashboard/jadwal`, unique hari+jam, klik-sel)
-- [x] **Galeri** publik + kelola album/foto (storage)
-- [x] **Informasi** publik + filter kategori
+- [x] **Galeri** (login) + kelola album/foto (storage)
+- [x] **Informasi** (login) + filter kategori
 - [x] Matriks role view/edit + middleware guard + helpers
 - [x] Kategori pengumuman **peringatan** (form siswa + UI tegas)
 - [x] Kategori pengumuman **tugas** (deadline, mapel, status kumpul per siswa, final)
@@ -238,7 +244,7 @@ Script lain di `scripts/`: `cleanup-xf-local.mjs`, `verify-*.mjs`, `apply-006-wa
 
 ### Perhatian / follow-up ops
 
-- [ ] Pastikan migration `007`→`011` + **`012_incident_log_fields`** sudah di-run di Supabase
+- [ ] Pastikan migration `007`→`011` + **`012_incident_log_fields`** + **`013_require_login_revoke_anon`** sudah di-run di Supabase
 - [ ] Verifikasi end-to-end per role (kas, piket kebersihan, log keamanan, peringatan, jadwal) di environment live
 - [ ] Deploy Vercel + env production terset lengkap
 - [ ] Typecheck: ada error pre-existing di `src/app/actions/pengurus.ts` (Promise builder Supabase) — perbaiki jika menyentuh file itu

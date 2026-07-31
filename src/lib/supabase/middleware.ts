@@ -52,10 +52,16 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Proteksi dashboard — guest diarahkan ke login
-  if (!user && path.startsWith('/dashboard')) {
+  // Semua halaman wajib login. Hanya /login (+ auth callback) terbuka untuk guest.
+  const GUEST_PATHS = ['/login', '/auth']
+  const isGuestPath = GUEST_PATHS.some(
+    (p) => path === p || path.startsWith(`${p}/`)
+  )
+
+  if (!user && !isGuestPath) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    url.search = ''
     url.searchParams.set('callbackUrl', path)
     return NextResponse.redirect(url)
   }
